@@ -63,12 +63,10 @@ RUN a2ensite devbox.virtualserver.conf
 
 EXPOSE 80 443
 
-WORKDIR /var/www/html
+WORKDIR /var/www/app
 
-RUN rm index.html
+RUN echo "* * * * * cd /var/www/app && php artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/artisan
 
-RUN echo "* * * * * cd /var/www/html && php artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/artisan
+#HEALTHCHECK CMD curl --fail http://localhost:80/ || exit 1
 
-HEALTHCHECK CMD curl --fail http://localhost:80/ || exit 1
-
-CMD apachectl -D FOREGROUND
+CMD apachectl -D FOREGROUND && cron -f
